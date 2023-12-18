@@ -6,24 +6,24 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-mongoose.connection.on('connected', () => {
-  console.log('Mongoose is connected to the database');
+mongoose.connection.on("connected", () => {
+  console.log("Mongoose is connected to the database");
 });
 
 // Define the Person schema
 const personSchema = new mongoose.Schema({
   name: { type: String, required: true },
   age: Number,
-  favoriteFoods: [String]
+  favoriteFoods: [String],
 });
 
-let Person = mongoose.model('Person', personSchema);
+let Person = mongoose.model("Person", personSchema);
 
 const createAndSavePerson = (done) => {
   const newPerson = new Person({
     name: "Ely Niv",
     age: 18,
-    favoriteFoods: ["pizza", "pasta"]
+    favoriteFoods: ["pizza", "pasta"],
   });
 
   newPerson.save((err, data) => {
@@ -33,28 +33,45 @@ const createAndSavePerson = (done) => {
 };
 
 const createManyPeople = (arrayOfPeople, done) => {
-  Person.create(arrayOfPeople,(err,people) => {
+  Person.create(arrayOfPeople, (err, people) => {
     if (err) return done(err);
-    done(null , people);
-  })
+    done(null, people);
+  });
 };
 
 const findPeopleByName = (personName, done) => {
-  done(null /*, data*/);
+  Person.find({ name: personName }, (err, peopleFound) => {
+    if (err) return done(err);
+    done(null, peopleFound);
+  });
 };
 
 const findOneByFood = (food, done) => {
-  done(null /*, data*/);
+  Person.findOne({ favoriteFoods, food }, (err, personFound) => {
+    if (err) return done(err);
+    done(null, personFound);
+  });
 };
 
 const findPersonById = (personId, done) => {
-  done(null /*, data*/);
+  Person.findById(personId, (err, personFound) => {
+    if (err) return done(err);
+    done(null, personFound);
+  });
 };
 
 const findEditThenSave = (personId, done) => {
   const foodToAdd = "hamburger";
+  Person.findById(personId, (err, person) => {
+    if (err) return done(err);
 
-  done(null /*, data*/);
+    person.favoriteFoods.push(foodToAdd);
+    
+    person.save((error, updatedPerson) => {
+      if (error) return done(error);
+      done(null, updatedPerson);
+    });
+  });
 };
 
 const findAndUpdate = (personName, done) => {
